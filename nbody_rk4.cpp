@@ -160,7 +160,7 @@ int main()
     }
   }
 
-  int timesteps = (time/h);
+  unsigned long int timesteps = (time/h);
 
   vector<double> masses;
   vector<vector<double> > positions, velocities;

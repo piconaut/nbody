@@ -22,19 +22,19 @@ pygame.init()
 
 def initialize(n):
   # Manually hard coding initial conditions for testing
-  #m = [1.,1.,1.]
-  #pos = [np.array([7.5,5.,7.]),np.array([9.5,2.,5.]),np.array([6.5,2.,7.])]
-  #vel = [np.array([-0.15,0.2,0.1]),np.array([0.03,-0.2,-0.2]),np.array([0.,0.,0.1])]
+  m = [1.,1.,1.]
+  pos = [np.array([7.5,5.,7.]),np.array([9.5,2.,5.]),np.array([6.5,2.,7.])]
+  vel = [np.array([-0.15,0.2,0.1]),np.array([0.03,-0.2,-0.2]),np.array([0.,0.,0.1])]
 
-  m = []
-  pos = []
-  vel = []
+#  m = []
+#  pos = []
+#  vel = []
 
-  np.random.seed(10)
-  for i in range(n):
-    m.append(np.random.rand() + 0.5)
-    pos.append(np.random.rand(3)*sim_w)
-    vel.append(2*np.random.rand(3) - np.array([1.,1.,1.]))
+ # np.random.seed(10)
+ # for i in range(n):
+ #   m.append(np.random.rand() + 0.5)
+ #   pos.append(np.random.rand(3)*sim_w)
+ #   vel.append(2*np.random.rand(3) - np.array([1.,1.,1.]))
 
   screen = pygame.display.set_mode((screen_w,screen_h))
 
