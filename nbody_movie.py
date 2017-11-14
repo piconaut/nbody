@@ -37,12 +37,30 @@ with open('nbody.log','r') as f:
     lines.append(line.strip().split(' '))
 
 pos = []
+vel = []
+mass = []
+Ek = 0
+Ug = 0
 for i in range(len(lines)):
   if len(lines[i]) == 1:
     draw(pos)
+    for i in range(len(mass)):
+      Ek += 0.5*mass[i]*np.linalg.norm(np.array([vel[i][0],vel[i][1],vel[i][2]]))**2
+      for j in range(len(mass)):
+        if i != j:
+#          r = math.sqrt((pos[j][0]-pos[i][0])**2 + (pos[j][1]-pos[i][1])**2 + (pos[j][2]-pos[i][2])**2)
+          r = np.linalg.norm(np.array([pos[j][0],pos[j][1],pos[j][2]])-np.array([pos[i][0],pos[i][1],pos[i][2]]))
+          Ug -= mass[j]*mass[i]/r
+    print(Ek + Ug)
+    Ek = 0
+    Ug = 0
     pos = []
+    mass = []
+    vel = []
+
   else:
     pos.append([float(lines[i][1])+sim_w/2.,float(lines[i][2])+sim_w/2.,float(lines[i][3])+sim_w/2.])
-    
+    vel.append([float(lines[i][4]), float(lines[i][5]), float(lines[i][6])])
+    mass.append(float(lines[i][0]))
 
 file_num = 0
