@@ -188,7 +188,7 @@ int main()
            << velocities[star][2] << endl;
     }}
 //    cout << Et << endl;
-    cout << "!!!!!!!!!" <<step<< endl;
+    if(step%100==0){cout << "!!!!!!!!!" <<step<< endl;}
   }
   
   return 0;
