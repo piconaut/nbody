@@ -180,8 +180,8 @@ int main()
 
  //     velocity_sq = pow(velocities[star][0],2) + pow(velocities[star][1],2) + pow(velocities[star][2],2);
  //     Et += 0.5 * masses[star] * velocity_sq;
-      cout << positions[star][0] << " " << positions[star][1] << " "
-           << positions[star][2] << endl;
+      cout << masses[star] << " " << positions[star][0] << " " 
+           << positions[star][1] << " " << positions[star][2] << endl;
     }
 //    cout << Et << endl;
     cout << "!!!!!!!!!" << endl;
