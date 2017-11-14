@@ -188,7 +188,7 @@ int main()
            << velocities[star][2] << endl;
     }}
 //    cout << Et << endl;
-    cout << "!!!!!!!!!" << endl;
+    cout << "!!!!!!!!!" <<step<< endl;
   }
   
   return 0;
