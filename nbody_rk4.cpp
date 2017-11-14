@@ -173,7 +173,6 @@ int main()
 
   double Et,velocity_sq;
 
-  cout << timesteps;
   for (int step=0; step<timesteps; step++){
     rk4_evolve(masses,positions,velocities,h,new_positions, new_velocities, false);
     Et = 0;
