@@ -138,8 +138,29 @@ void rk4_evolve(vector<double>& masses, vector<vector<double> >& positions,
 
 int main()
 {
-  double h = 0.001;
-  int timesteps = 30000;
+  double h;
+  double time;
+
+  ifstream inFile;
+  inFile.open("input");
+  if (!inFile){
+    cout << "Unable to open input" << endl;
+    exit(1);
+  }
+
+  double number;
+  int counter = 0;
+  while (inFile >> number){
+    if (counter == 0){
+      h = number;
+      counter++;
+    }
+    else{
+      time = number;
+    }
+  }
+
+  int timesteps = (time/h);
 
   vector<double> masses;
   vector<vector<double> > positions, velocities;
