@@ -10,8 +10,8 @@ from pygame.locals import *
 sim_w = 10.0
 sim_h = 10.0
 sim_depth = 2.0
-screen_w = 200
-screen_h = 200
+screen_w = 400
+screen_h = 400
 
 w_factor = screen_w/sim_w
 h_factor = screen_h/sim_h

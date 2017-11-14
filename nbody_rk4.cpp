@@ -73,7 +73,7 @@ vector<double> acc(vector<double>& masses, vector<vector<double> >& positions,
     if (i != index){
       rsq = 0;
       for (int j=0; j<3; j++){
-        r[j] = positions[i][j] - position[j],0.01;
+        r[j] = positions[i][j] - position[j];
         rsq += max(r[j]*r[j],0.01);
       }
 
