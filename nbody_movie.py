@@ -7,6 +7,8 @@ import pygame
 import pygame.camera
 from pygame.locals import *
 
+os.environ['SDL_VIDEODRIVER'] = 'dummy'
+
 sim_w = 10.0
 sim_h = 10.0
 sim_depth = 2.0
@@ -17,7 +19,9 @@ w_factor = screen_w/sim_w
 h_factor = screen_h/sim_h
 
 pygame.init()
-screen = pygame.display.set_mode((screen_w,screen_h))
+pygame.display.set_mode((1,1))
+screen = pygame.Surface((400, 400), pygame.SRCALPHA, 32)
+pygame.draw.rect(screen, (0,0,0), (0, 0, 400, 400), 0)
 
 def draw(pos):
 
@@ -26,7 +30,8 @@ def draw(pos):
 
   # Draw bodies
   for i in range(len(pos)):
-    pygame.draw.circle(screen,(max(min(255,pos[i][2]*255.),0),max(min(255,pos[i][2]*255),0),max(min(255,pos[i][2]*255.),0)), (math.floor(pos[i][0]*w_factor), math.floor(pos[i][1]*h_factor)),1)
+#    pygame.draw.circle(screen,(max(min(255,pos[i][2]*255.),0),max(min(255,pos[i][2]*255),0),max(min(255,pos[i][2]*255.),0)), (math.floor(pos[i][0]*w_factor), math.floor(pos[i][1]*h_factor)),1)
+    screen.set_at((math.floor(pos[i][0]*w_factor), math.floor(pos[i][1]*h_factor)),(max(min(255,pos[i][2]*255.),0),max(min(255,pos[i][2]*255),0),max(min(255,pos[i][2]*255.),0)))
 
   # Flip display
   pygame.display.flip()
@@ -58,9 +63,9 @@ with open('nbody.log','r') as f:
         mass = []
         vel = []
 
-       file_num = file_num + 1
-       filename = "./video/%04d.png" % file_num
-       pygame.image.save(screen,filename)
+        file_num = file_num + 1
+        filename = "./video/%04d.png" % file_num
+        pygame.image.save(screen,filename)
 
       else:
         pos.append([float(line_split[1])+sim_w/2.,float(line_split[2])+sim_w/2.,float(line_split[3])+sim_w/2.])
@@ -68,4 +73,4 @@ with open('nbody.log','r') as f:
         mass.append(float(line_split[0]))
 
 os.system("avconv -r 100 -f image2 -i video/%04d.png -y -qscale 0 -s " + str(screen_w) + "x"     + str(screen_h) + " -aspect 1:1 result.mp4")
-os.system("rm video/*")
+#os.system("rm video/*")
