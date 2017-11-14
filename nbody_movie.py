@@ -42,7 +42,7 @@ for i in range(len(lines)):
     draw(pos)
     pos = []
   else:
-    pos.append([float(lines[i][0])+sim_w/2.,float(lines[i][1])+sim_w/2.,float(lines[i][2])+sim_w/2.])
+    pos.append([float(lines[i][1])+sim_w/2.,float(lines[i][2])+sim_w/2.,float(lines[i][3])+sim_w/2.])
     
 
 file_num = 0
