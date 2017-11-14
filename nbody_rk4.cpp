@@ -27,8 +27,8 @@ vector<double> scalarmult(vector<double> vec, float scalar)
   return prod;
 }
 
-void read_file(vector<double>& masses, vector<vector<double>>& positions, 
-               vector<vector<double>>& velocities)
+void read_file(vector<double>& masses, vector<vector<double> >& positions, 
+               vector<vector<double> >& velocities)
 {
   ifstream inFile;
 
@@ -61,7 +61,7 @@ void read_file(vector<double>& masses, vector<vector<double>>& positions,
 
 }
 
-vector<double> acc(vector<double>& masses, vector<vector<double>>& positions, 
+vector<double> acc(vector<double>& masses, vector<vector<double> >& positions, 
                    int index, vector<double>& position, double h, bool print)
 {
   int N = masses.size();
@@ -87,10 +87,10 @@ vector<double> acc(vector<double>& masses, vector<vector<double>>& positions,
   return current_acc;
 }
 
-void rk4_evolve(vector<double>& masses, vector<vector<double>>& positions,
-                vector<vector<double>>& velocities, double h,
-                vector<vector<double>>& new_positions,
-                vector<vector<double>>& new_velocities,bool print)
+void rk4_evolve(vector<double>& masses, vector<vector<double> >& positions,
+                vector<vector<double> >& velocities, double h,
+                vector<vector<double> >& new_positions,
+                vector<vector<double> >& new_velocities,bool print)
 {
   int N = masses.size();
 
@@ -142,13 +142,13 @@ int main()
   int timesteps = 30000;
 
   vector<double> masses;
-  vector<vector<double>> positions, velocities;
+  vector<vector<double> > positions, velocities;
 
   read_file(masses,positions,velocities);
   int N = masses.size();
 
-  vector<vector<double>> new_positions(masses.size());
-  vector<vector<double>> new_velocities(masses.size());
+  vector<vector<double> > new_positions(masses.size());
+  vector<vector<double> > new_velocities(masses.size());
 
   double Et,velocity_sq;
 
