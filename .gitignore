@@ -1,4 +1,4 @@
-*.log
+*.log*
 *.swp
 *.mp4
 *.out
