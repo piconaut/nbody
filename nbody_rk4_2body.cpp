@@ -73,7 +73,7 @@ vector<double> acc(vector<double>& masses, vector<vector<double> >& positions,
     rsq += position[j]*position[j];
   }
 
-      r3 = pow(rsq,1.5);
+      r3 = pow(rsq,1.5) + 0.0001;
 
       for (int j=0; j<3; j++){
         current_acc[j] -= masses[index]*position[j]/r3;
