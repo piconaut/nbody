@@ -77,7 +77,7 @@ vector<double> acc(vector<double>& masses, vector<vector<double> >& positions,
         rsq += r[j]*r[j];
       }
 
-      r3 = pow(rsq,1.5) + 0.0001;
+      r3 = pow(rsq,1.5) + 0.000001;
 
       for (int j=0; j<3; j++){
         current_acc[j] += masses[i]*r[j]/r3;
