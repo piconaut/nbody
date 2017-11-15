@@ -45,20 +45,20 @@ Ug = 0
 file_num = 0
 with open('nbody.log','r') as f:
   for i,line in enumerate(f):
-    if i%100==0:
+    if i%1==0:
       line_split = line.strip().split(' ')
     
       if len(line_split) == 1:
         draw(pos)
-#        for i in range(len(mass)):
-#          Ek += 0.5*mass[i]*np.linalg.norm(np.array([vel[i][0],vel[i][1],vel[i][2]]))**2
-#          for j in range(len(mass)):
-#            if i != j:
-#              r = np.linalg.norm(np.array([pos[j][0],pos[j][1],pos[j][2]])-np.array([pos[i][0],pos[i][1],pos[i][2]]))
-#              Ug -= mass[j]*mass[i]/r
-#        print(Ek + Ug)
-#        Ek = 0
-#        Ug = 0
+        for i in range(len(mass)):
+          Ek += 0.5*mass[i]*np.linalg.norm(np.array([vel[i][0],vel[i][1],vel[i][2]]))**2
+          for j in range(len(mass)):
+            if i == 0 and j == 1:
+              r = np.linalg.norm(np.array([pos[j][0],pos[j][1],pos[j][2]])-np.array([pos[i][0],pos[i][1],pos[i][2]]))
+              Ug -= mass[j]*mass[i]/r
+ #       print(Ug + Ek)
+        Ek = 0
+        Ug = 0
         pos = []
         mass = []
         vel = []

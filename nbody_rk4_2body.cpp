@@ -67,25 +67,19 @@ vector<double> acc(vector<double>& masses, vector<vector<double> >& positions,
   int N = masses.size();
   vector<double> current_acc(3);
   vector<double> r(3);
-  double rsq,r3;
+  double rsq, r3;
 
-  for (int i=0; i<N; i++){
-    if (i != index){
-      rsq = 0;
-      for (int j=0; j<3; j++){
-        r[j] = positions[i][j] - position[j];
-        rsq += r[j]*r[j];
-      }
+  for (int j=0; j<3; j++){
+    rsq += position[j]*position[j];
+  }
 
       r3 = pow(rsq,1.5);
 
       for (int j=0; j<3; j++){
-        current_acc[j] += masses[i]*r[j]/r3;
+        current_acc[j] -= masses[index]*position[j]/r3;
       }
-    }
-  }
+    
 
-  if(print){cout << current_acc[1] << endl;}
   return current_acc;
 }
 
@@ -98,7 +92,6 @@ void rk4_evolve(vector<double>& masses, vector<vector<double> >& positions,
 
   vector<double> k1(3), k2(3), k3(3), k4(3);
   vector<double> k2_position(3),k3_position(3);
-
   for(int i=0; i<N; i++){
 
     k1 = scalarmult(acc(masses, positions, i, positions[i], h, print), h);
@@ -121,7 +114,6 @@ void rk4_evolve(vector<double>& masses, vector<vector<double> >& positions,
                              )
                     , h)
                );
-
     new_velocities[i] = 
       vectoradd(velocities[i],
                 vectoradd(scalarmult(k1,1.0/6.0),
@@ -131,7 +123,6 @@ void rk4_evolve(vector<double>& masses, vector<vector<double> >& positions,
                );
 
   }
-
   std::swap(positions,new_positions);
   std::swap(velocities,new_velocities);
 }
@@ -173,35 +164,47 @@ int main()
   vector<vector<double> > new_positions(masses.size());
   vector<vector<double> > new_velocities(masses.size());
 
-  double Et,velocity_sq;
+  double Et,velocity_sq,Ek,Ug;
 
   for (int step=0; step<timesteps; step++){
     rk4_evolve(masses,positions,velocities,h,new_positions, new_velocities, false);
     Et = 0;
+    Ek = 0;
+    Ug = 0;
     for (int star=0; star<N; star++){
 
  //     velocity_sq = pow(velocities[star][0],2) + pow(velocities[star][1],2) + pow(velocities[star][2],2);
  //     Et += 0.5 * masses[star] * velocity_sq;
 
-      if(step%100==0){
-        cout << masses[star] << " " << positions[star][0] << " " 
-             << positions[star][1] << " " << positions[star][2] << " "
-             << velocities[star][0] << " " << velocities[star][1] << " "
-             << velocities[star][2] << endl;
-//        velocity_sq = pow(velocities[star][0],2) + pow(velocities[star][1],2) + pow(velocities[star][2],2);
- //       Et += 0.5 * masses[star] * velocity_sq;
-  //      if(star == 0){
-          
-  //        Et -= 1/sqrt(pow(positions[1][0]-positions[0][0],2)+pow(positions[1][1]-positions[0][1],2) + pow(positions[1][2]-positions[0][2],2));
-   //     }
+      if(step%100==0 || step == 0){
+//        cout << masses[star] << " " << positions[star][0] << " " 
+ //            << positions[star][1] << " " << positions[star][2] << " "
+ //            << velocities[star][0] << " " << velocities[star][1] << " "
+//             << velocities[star][2] << endl;
+        velocity_sq = pow(velocities[star][0],2) + pow(velocities[star][1],2) + pow(velocities[star][2],2);
+        Ek += 0.5 * masses[star] * velocity_sq;
+        if(star == 0){
+         
+          Ug -= masses[star]/sqrt(pow(positions[star][0],2) + pow(positions[star][1],2) + pow(positions[star][2],2));
+        }
+       cout << Ek << " " << Ug << " " << Ek + Ug << endl;
       }
     }
 //    cout << Et << endl;
-    if(step%100==0){cout << "!!!!!!!!!" <<step<< endl;}
+//   if(step%100==0){cout << "!!!!!!!!!" <<step<< endl;}
 
- //   if(step%100==0){cout<<Et<<endl;}
+    if(step%100==0){
+//      cout<<Et<<endl;
+ /*     cout << positions[0][0] << " " << positions[0][1] << " " << positions[0][2]
+           << " " << velocities[0][0] << " " << velocities[0][1] << " " << velocities[0][2] 
+           << endl;
+      cout << positions[1][0] << " " << positions[1][1] << " " << positions[1][2]
+           << " " << velocities[1][0] << " " << velocities[1][1] << " " << velocities[1][2] 
+           << endl;
+*/
+    }
   }
-//  cout<<Et<<endl;
+ // cout<<Et<<endl;
 
 //  cout << positions[0][0] << " " << positions[0][1] << " " << positions[0][2] << endl;
   return 0;

@@ -1,0 +1,80 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{courier}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{mathtools}
+
+\DeclarePairedDelimiterX{\infdivx}[2]{(}{)}{%
+  #1\;\delimsize\|\;#2%
+}
+\newcommand{\infdiv}{D\infdivx}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+\definecolor{g}{rgb}{0.95,0.95,0.92}
+
+\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
+\lstset{framextopmargin=50pt,frame=bottomline}
+\lstdefinestyle{CStyle}{
+    backgroundcolor=\color{backgroundColour},   
+    commentstyle=\color{mGreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{mPurple},
+    stringstyle=\color{mPurple},
+    basicstyle=\footnotesize\ttfamily,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=C
+}
+
+\pagenumbering{arabic}
+
+\linespread{2}
+
+\title{Literature Review}
+\author{Ian Fare}
+\date{November 8, 2017}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+\section{Building an N-body code}
+
+\subsection{Solving the N-body problem}
+
+The n-body problem is the problem of determining the motion of $n$ point masses $m_i$ at positions $\textbf{r}_i$, with $i=1,2,...,n$. With the motion of each point mass governed by Newton's law of universal gravitaion, the n-body problem is represented by a system of differential equations:
+
+\begin{equation}
+    \textbf{r''}_i = \sum_{\substack{j=1\\j\neq i}}^n \frac{Gm_j}{\norm{\textbf{r}_i-\textbf{r}_j}^2}(\textbf{r}_j-\textbf{r}_i)
+\end{equation}
+
+\section{Astrophysical considerations}
+
+\section{Studying star clusters using N-body simulations}
+
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{bibfile}
+
+\end{document}
