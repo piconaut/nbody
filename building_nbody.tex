@@ -60,7 +60,7 @@
 
 \section{Building an \textit{n}-body code}
 
-\subsection{Solving the \textit{n}-body problem}
+\subsection{Choosing an integratotion method}
 
 The \textit{n}-body problem is the problem of determining the motion of $n$ point masses $m_i$ at positions $\textbf{r}_i$, with $i=1,2,...,n$. With the motion of each point mass governed by Newton's law of universal gravitaion, the \textit{n}-body problem is represented by a system of $n$ second-order ordinary differential equations:
 
@@ -71,7 +71,11 @@ The \textit{n}-body problem is the problem of determining the motion of $n$ poin
 % Explain truncation
 \textit{n}-body simulations must solve this system of differential equations in one way or another. There are a number of numerical methods of solving these differential equations, differing in their accuracy and time complexity. Numerical methods step through time, advancing by some interval $h$ of time and calculating the position and velocity of each point mass. Each step introduces a \textit{local truncation error} (LTE) which scales with $h$, and the local truncation errors of each step accumulate to some \textit{global truncation error} (GTE) at time $t$. An integration method is of order $p$ if the local truncation error is on the order of $\mathcal{O}(h^{p+1})$. So, given the initial state of an \textit{n}-body system, to solve for the system at time $t$ with a given error tolerance, a higher-order method will not require as small an interval $h$ as a lower-order method, and will reach $t$ with fewer time steps, and thus with less computation. 
 
+\subsection{Programming the Runge-Kutta method}
 
+
+
+\subsection{Other integration methods}
 
 
 \section{Astrophysical considerations}
