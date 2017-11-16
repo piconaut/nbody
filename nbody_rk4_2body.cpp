@@ -66,17 +66,18 @@ vector<double> acc(vector<double>& masses, vector<vector<double> >& positions,
 {
   int N = masses.size();
   vector<double> current_acc(3);
-  vector<double> r(3);
-  double rsq, r3;
+  vector<double> r(3), rnorm(3);
+  double rsq, r3, rmag;
 
   for (int j=0; j<3; j++){
     rsq += position[j]*position[j];
   }
 
-      r3 = pow(rsq,1.5) + 0.0001;
+      rmag = sqrt(rsq);
+      rnorm = scalarmult(position,1.0/rmag);
 
       for (int j=0; j<3; j++){
-        current_acc[j] -= masses[index]*position[j]/r3;
+        current_acc[j] -= masses[index]*rnorm[j]/(rmag*rmag);
       }
     
 
@@ -187,7 +188,7 @@ int main()
          
           Ug -= masses[star]/sqrt(pow(positions[star][0],2) + pow(positions[star][1],2) + pow(positions[star][2],2));
         }
-       cout << Ek << " " << Ug << " " << Ek + Ug << endl;
+       cout << Ek + Ug << endl;
       }
     }
 //    cout << Et << endl;
