@@ -77,7 +77,7 @@ vector<double> acc(vector<double>& masses, vector<vector<double> >& positions,
         rsq += r[j]*r[j];
       }
 
-      rmag = sqrt(rsq + 0.0001)
+      rmag = sqrt(rsq + 0.001)
 
       r3 = pow(rmag,3.0);
 

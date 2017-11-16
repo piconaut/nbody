@@ -48,7 +48,7 @@
 
 \linespread{2}
 
-\title{Building and Using an N-body Code}
+\title{Building and Using an \textit{n}-body Code}
 \author{Ian Fare}
 \date{November 8, 2017}
 
@@ -58,22 +58,25 @@
 
 \section{Introduction}
 
-\section{Building an N-body code}
+\section{Building an \textit{n}-body code}
 
-\subsection{Solving the N-body problem}
+\subsection{Solving the \textit{n}-body problem}
 
-The n-body problem is the problem of determining the motion of $n$ point masses $m_i$ at positions $\textbf{r}_i$, with $i=1,2,...,n$. With the motion of each point mass governed by Newton's law of universal gravitaion, the n-body problem is represented by a system of $n$ second-order ordinary differential equations:
+The \textit{n}-body problem is the problem of determining the motion of $n$ point masses $m_i$ at positions $\textbf{r}_i$, with $i=1,2,...,n$. With the motion of each point mass governed by Newton's law of universal gravitaion, the \textit{n}-body problem is represented by a system of $n$ second-order ordinary differential equations:
 
 \begin{equation}
     \textbf{r''}_i = \sum_{\substack{j=1\\j\neq i}}^n \frac{Gm_j}{\norm{\textbf{r}_i-\textbf{r}_j}^3}(\textbf{r}_j-\textbf{r}_i)
 \end{equation}
 
-N-body simulations must solve this system of differential equations in one way or another. There are a number of numerical methods of solving these differential equations, differing in their accuracy and time complexity.
+% Explain truncation
+\textit{n}-body simulations must solve this system of differential equations in one way or another. There are a number of numerical methods of solving these differential equations, differing in their accuracy and time complexity. Numerical methods step through time, advancing by some interval $h$ of time and calculating the position and velocity of each point mass. Each step introduces a \textit{local truncation error} (LTE) which scales with $h$, and the local truncation errors of each step accumulate to some \textit{global truncation error} (GTE) at time $t$. An integration method is of order $p$ if the local truncation error is on the order of $\mathcal{O}(h^{p+1})$. So, given the initial state of an \textit{n}-body system, to solve for the system at time $t$ with a given error tolerance, a higher-order method will not require as small an interval $h$ as a lower-order method, and will reach $t$ with fewer time steps, and thus with less computation. 
+
+
 
 
 \section{Astrophysical considerations}
 
-\section{Studying star clusters using n-body codes}
+\section{Studying star clusters using \textit{n}-body codes}
 
 
 
