@@ -67,7 +67,7 @@ vector<double> acc(vector<double>& masses, vector<vector<double> >& positions,
   int N = masses.size();
   vector<double> current_acc(3);
   vector<double> r(3);
-  double rsq,r3,rsqrt;
+  double rsq,r3,rmag;
 
   for (int i=0; i<N; i++){
     if (i != index){
@@ -77,7 +77,7 @@ vector<double> acc(vector<double>& masses, vector<vector<double> >& positions,
         rsq += r[j]*r[j];
       }
 
-      rmag = sqrt(rsq + 0.0001)
+      rmag = sqrt(rsq + 0.0001);
 
       r3 = pow(rmag,3.0);
 
