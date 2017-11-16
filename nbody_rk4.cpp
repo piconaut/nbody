@@ -37,7 +37,6 @@ void read_file(vector<double> &masses, vector<vector<double> > &positions,
   inFile.open("fort.10");
   if (!inFile){
     cout << "Unable to open fort.10" << endl;
-    exit(1);
   }
 
   double number;
@@ -119,21 +118,21 @@ void rk4_step(vector<double>& masses, vector<vector<double> > &positions,
   for(int i=0; i<N; i++){
 
     // Calculate k1
-    k1 = scalarmult(acc(masses, positions, i, positions[i], h, print), h);
+    k1 = scalarmult(acc(masses, positions, i, positions[i]), h);
 
     // Calculate k2
     k2_position = vectoradd(vectoradd(positions[i], 
                                       scalarmult(velocities[i], 0.5*h)),
                             scalarmult(k1, 0.125*h));
     
-    k2 = scalarmult(acc(masses, positions, i, k2_position, h, print), h);
+    k2 = scalarmult(acc(masses, positions, i, k2_position), h);
 
     // Calculate k3
     k3_position = vectoradd(vectoradd(positions[i],
                                       scalarmult(velocities[i], h)),
                             scalarmult(k2, 0.5*h));
    
-    k3 = scalarmult(acc(masses, positions, i, k3_position, h, print), h);
+    k3 = scalarmult(acc(masses, positions, i, k3_position), h);
 
     // Calculate the particle's new position
     new_positions[i] = 
@@ -166,7 +165,6 @@ int main()
   inFile.open("input");
   if (!inFile){
     cout << "Unable to open input" << endl;
-    exit(1);
   }
 
   double number;
@@ -195,7 +193,7 @@ int main()
   double Et,velocity_sq;
 
   for (int step=0; step<timesteps; step++){
-    rk4_evolve(masses,positions,velocities,h,new_positions, new_velocities, false);
+    rk4_step(masses,positions,velocities,h,new_positions, new_velocities, false);
     Et = 0;
     for (int star=0; star<N; star++){
 
