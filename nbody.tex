@@ -48,7 +48,7 @@
 
 \linespread{2}
 
-\title{Literature Review}
+\title{Building and Using an N-body Code}
 \author{Ian Fare}
 \date{November 8, 2017}
 
@@ -62,15 +62,18 @@
 
 \subsection{Solving the N-body problem}
 
-The n-body problem is the problem of determining the motion of $n$ point masses $m_i$ at positions $\textbf{r}_i$, with $i=1,2,...,n$. With the motion of each point mass governed by Newton's law of universal gravitaion, the n-body problem is represented by a system of differential equations:
+The n-body problem is the problem of determining the motion of $n$ point masses $m_i$ at positions $\textbf{r}_i$, with $i=1,2,...,n$. With the motion of each point mass governed by Newton's law of universal gravitaion, the n-body problem is represented by a system of $n$ second-order ordinary differential equations:
 
 \begin{equation}
-    \textbf{r''}_i = \sum_{\substack{j=1\\j\neq i}}^n \frac{Gm_j}{\norm{\textbf{r}_i-\textbf{r}_j}^2}(\textbf{r}_j-\textbf{r}_i)
+    \textbf{r''}_i = \sum_{\substack{j=1\\j\neq i}}^n \frac{Gm_j}{\norm{\textbf{r}_i-\textbf{r}_j}^3}(\textbf{r}_j-\textbf{r}_i)
 \end{equation}
+
+N-body simulations must solve this system of differential equations in one way or another. There are a number of numerical methods of solving these differential equations, differing in their accuracy and time complexity.
+
 
 \section{Astrophysical considerations}
 
-\section{Studying star clusters using N-body simulations}
+\section{Studying star clusters using n-body codes}
 
 
 
