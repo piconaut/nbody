@@ -96,7 +96,7 @@ void rk4_evolve(vector<double>& masses, vector<vector<double> >& positions,
 {
   int N = masses.size();
 
-  vector<double> k1(3), k2(3), k3(3), k4(3);
+  vector<double> k1(3), k2(3), k3(3);
   vector<double> k2_position(3),k3_position(3);
 
   for(int i=0; i<N; i++){

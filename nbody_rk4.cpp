@@ -74,31 +74,34 @@ void read_file(vector<double> &masses, vector<vector<double> > &positions,
 }
 
 vector<double> acc(vector<double> &masses, vector<vector<double> > &positions, 
-                   int index, vector<double> &position, double h, bool print)
+                   int index, vector<double> &position)
 {
   int N = masses.size();
-  vector<double> current_acc(3);
-  vector<double> r(3), rnorm(3);
+  vector<double> current_acc(3), r(3), rnorm(3);
   double rsq,rmag;
 
+  // For each particle
   for (int i=0; i<N; i++){
+    // If it's not the one being stepped forward
     if (i != index){
       rsq = 0;
+      // Calculate difference in position, and |r|^2
       for (int j=0; j<3; j++){
         r[j] = positions[i][j] - position[j];
         rsq += r[j]*r[j];
       }
 
+      // Calculate |r|, use it to normalize r
       rmag = sqrt(rsq + 0.0001);
       rnorm = scalarmult(r,1.0/rmag);
 
+      // Add to acceleration vector
       for (int j=0; j<3; j++){
         current_acc[j] += masses[i]*rnorm[j]/(rmag*rmag);
       }
     }
   }
 
-  if(print){cout << current_acc[1] << endl;}
   return current_acc;
 }
 

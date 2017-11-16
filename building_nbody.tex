@@ -19,6 +19,7 @@
 \definecolor{mGreen}{rgb}{0,0.6,0}
 \definecolor{mGray}{rgb}{0.5,0.5,0.5}
 \definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{mBlue}{rgb}{0,0,0.6}
 \definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
 \definecolor{g}{rgb}{0.95,0.95,0.92}
 
@@ -41,7 +42,7 @@
     showstringspaces=false,
     showtabs=false,                  
     tabsize=2,
-    language=C
+    language=C++
 }
 
 \pagenumbering{arabic}
@@ -68,11 +69,136 @@ The \textit{n}-body problem is the problem of determining the motion of $n$ poin
     \textbf{r''}_i = \sum_{\substack{j=1\\j\neq i}}^n \frac{Gm_j}{\norm{\textbf{r}_i-\textbf{r}_j}^3}(\textbf{r}_j-\textbf{r}_i)
 \end{equation}
 
-% Explain truncation
+% Explain truncation errors
 \textit{n}-body simulations must solve this system of differential equations in one way or another. There are a number of numerical methods of solving these differential equations, differing in their accuracy and time complexity. Numerical methods step through time, advancing by some interval $h$ of time and calculating the position and velocity of each point mass. Each step introduces a \textit{local truncation error} (LTE) which scales with $h$, and the local truncation errors of each step accumulate to some \textit{global truncation error} (GTE) at time $t$. An integration method is of order $p$ if the local truncation error is on the order of $\mathcal{O}(h^{p+1})$. So, given the initial state of an \textit{n}-body system, to solve for the system at time $t$ with a given error tolerance, a higher-order method will not require as small an interval $h$ as a lower-order method, and will reach $t$ with fewer time steps, and thus with less computation. 
 
 \subsection{Programming the Runge-Kutta method}
+% Particle vs. point mass vs star terminology
+% Cite Handbook of Mathematical Functions, by M. Abramowitz and I. A. Stegun, eds. [Dover, 1965]
 
+The fourth-order Runge-Kutta method (RK4) is a popular integrator for instructive purposes, although higher-order methods are generally used for research. To solve a second-order ODE of the form $\textbf{r''} = \textbf{F}(\textbf{r})$, like Newton's law of universal gravitation, the method is as follows \cite{olver1965handbook}:
+
+\begin{align}
+  \textbf{r}_{n+1} &= \textbf{r}_n + h\bigg(\textbf{r'}_n + \frac{1}{6}(\textbf{k}_1 + 2\textbf{k}_2)\bigg) + \mathcal{O}(h^4) \\
+  \textbf{r'}_{n+1} &= \textbf{r'}_n + \frac{1}{6}\textbf{k}_1 + \frac{2}{3}\textbf{k}_2 + \frac{1}{6}\textbf{k}_3 \\
+  \textbf{k}_1 &= h\textbf{F}(\textbf{r}_n) \\
+  \textbf{k}_2 &= h\textbf{F}\bigg(\textbf{r}_n + \frac{h}{2}\textbf{r'}_n + \frac{h}{8}\textbf{k}_1\bigg) \\
+  \textbf{k}_3 &= h\textbf{F}\bigg(\textbf{r}_n + h\textbf{r'}_n + \frac{h}{2}\textbf{k}_2\bigg)
+\end{align}
+
+In the case of an \textit{n}-body code, \textbf{r} is a particle's position in space, and \textbf{F} is the force of gravity, from all the other particles.
+
+To get started programming RK4 in C++, I include the libraries \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|iostream|}, \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|iomanip|}, \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|fstream|}, \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|cmath|}, and \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|vector|}, and use the namespace \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|std|}. To generate particles with masses, positions, and velocities, I wrote a function called \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|read_file()|} which takes as arguments pointers to three vectors: \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|masses|}, which will contain the masses of the particles, \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|positions|}, which will contain their positions, and \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|velocities|}, which will contain their velocities. The latter two are vectors of vectors (or, 2D matrices), as each position and velocity is itself a vector of length 3, as we are working in three dimensions. Each of these vectors has a size of \textit{n}, where \textit{n} is the number of particles to be simulated. The function reads a file called \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|./fort.10|}, which contains this information in the format required for NBODY6, and fills the vectors with the values found therein. I have also written a function \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|vectoradd()|}, which takes two vectors as arguments and returns their sum as you would expect, and \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|scalarmult()|}, which takes a vector as its first argument and a scalar as its second argument and returns the vector multiplied by the scalar. 
+
+My implementation of RK4 lives in a function that takes as arguments the step size, as well as the pointers for the vectors \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|masses|}, \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|positions|}, and \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|velocities|}, and of two other vectors, \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|new_positions|} and \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|new_velocities|}. It iterates through each particle (the \textit{i}th element in \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|masses|} corresponds to the \textit{i}th element in \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|positions|} and in \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|velocities|}). For each particle, it calculates new position and velocity vectors following the equations above: Equation (2) corresponds to lines 31 through 36, Equation (3) corresponds to lines 38 through 43, Equation (4) corresponds to lines 14 and 15, Equation (5) corresponds to lines lines 17 through 22, and Equation (6) corresponds to lines 24 through 29. Finally, it swaps the old and new position and velocity vectors, to get ready for the next step.
+
+\linespread{1}
+\begin{lstlisting}[style=CStyle,firstnumber=1]
+void rk4_step(vector<double> &masses, vector<vector<double> > &positions,
+              vector<vector<double> > &velocities, double h,
+              vector<vector<double> > &new_positions,
+              vector<vector<double> > &new_velocities)
+{
+  int N = masses.size();
+
+  vector<double> k1(3), k2(3), k3(3);
+  vector<double> k2_position(3),k3_position(3);
+
+  // For each particle
+  for(int i=0; i<N; i++){
+
+    // Calculate k1
+    k1 = scalarmult(acc(masses, positions, i, positions[i], h, print), h); 
+
+    // Calculate k2
+    k2_position = vectoradd(vectoradd(positions[i], 
+                                      scalarmult(velocities[i], 0.5*h)),
+                            scalarmult(k1, 0.125*h));
+    
+    k2 = scalarmult(acc(masses, positions, i, k2_position, h, print), h); 
+
+    // Calculate k3
+    k3_position = vectoradd(vectoradd(positions[i],
+                                      scalarmult(velocities[i], h)),
+                            scalarmult(k2, 0.5*h));
+    
+    k3 = scalarmult(acc(masses, positions, i, k3_position, h, print), h); 
+
+    // Calculate the particle's new position
+    new_positions[i] = 
+      vectoradd(positions[i],
+        scalarmult(vectoradd(velocities[i],
+                             scalarmult(vectoradd(k1,scalarmult(k2,2.0)),
+                                        1.0/6.0)), h));
+
+    // Calculate the particle's new velocity
+    new_velocities[i] = 
+      vectoradd(velocities[i],
+                vectoradd(scalarmult(k1,1.0/6.0),
+                          vectoradd(scalarmult(k2,2.0/3.0),
+                                    scalarmult(k3,1.0/6.0))));
+  }
+
+  // Swap new and old positions and velocities
+  std::swap(positions,new_positions);
+  std::swap(velocities,new_velocities);
+}
+\end{lstlisting}
+\linespread{2}
+
+That's all that it takes to program RK4. There are even simpler implementations, but this way the lines of code correspond directly to lines in the method's mathematical notation. Now, each time $\textbf{k}_1$, $\textbf{k}_2$, and $\textbf{k}_3$ are calculated, the function calls another function: \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|acc()|}, which calculates the acceleration vector on the particle currently being stepped forwards, simply evaluating the right-hand side of Equation (1). For gravity, I have the function take as inputs the index of the mass being stepped forward (its position in the mass, position, and velocity vectors), and pointers to the mass, position, and velocity vectors, as well as to another vector (which I probably should have named less confusingly), \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|position|}. The \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|position|} (singular) vector contains the position at which to calculate acceleration; for $\textbf{k}_2$ and $\textbf{k}_3$, this is not necessarily the particle's actual (previous) position in the \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|positions|} (plural) vector. Here is the code:
+
+\linespread{1}
+\begin{lstlisting}[style=CStyle,firstnumber=1]
+vector<double> acc(vector<double> &masses, vector<vector<double> > &positions, 
+                   int index, vector<double> &position)
+{
+  int N = masses.size();
+  vector<double> current_acc(3), r(3), rnorm(3);
+  double rsq,rmag;
+
+  // For each particle
+  for (int i=0; i<N; i++){
+    // If it's not the one being stepped forward
+    if (i != index){
+      rsq = 0;
+      // Calculate difference in position, and |r|^2
+      for (int j=0; j<3; j++){
+        r[j] = positions[i][j] - position[j];
+        rsq += r[j]*r[j];
+      }   
+
+      // Calculate |r|, use it to normalize r
+      rmag = sqrt(rsq + 0.0001);
+      rnorm = scalarmult(r,1.0/rmag);
+
+      // Add to acceleration vector
+      for (int j=0; j<3; j++){
+        current_acc[j] += masses[i]*rnorm[j]/(rmag*rmag);
+      }   
+    }   
+  }
+
+  return current_acc;
+}
+\end{lstlisting}
+\linespread{2}
+
+Now, it is worth mentioning that I actually had to make a choice in writing this code. There are two mathematically equivalent ways of representing Newton's law of universal gravitation. I gave one of them in Equation (1):
+
+\begin{equation*}
+    \textbf{r''}_i = \sum_{\substack{j=1\\j\neq i}}^n \frac{Gm_j}{\norm{\textbf{r}_i-\textbf{r}_j}^3}(\textbf{r}_j-\textbf{r}_i)
+\end{equation*}
+
+Equivalently,
+
+\begin{equation}
+    \textbf{r''}_i = \sum_{\substack{j=1\\j\neq i}}^n \frac{Gm_j}{\norm{\textbf{r}_i-\textbf{r}_j}^2}\frac{(\textbf{r}_j-\textbf{r}_i)}{\norm{\textbf{r}_i-\textbf{r}_j}}
+\end{equation}
+
+While these mathematically mean the same thing, they might produce different results in a simulation. That's because, in Equation (1), we run the risk of getting a very small number for $\norm{\textbf{r}_i-\textbf{r}_j}^3$ in the denominator, and running into floating point errors. Although Alice and Bob, the characters in Hut and Makino's Maya Open Lab Development Series \cite{hut2007art}, seem happy to use Equation (1), I would suggest that they opt for Equation (7) instead, as I did.
+
+These two functions contain most of my \textit{n}-body code. The main function just runs \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|rk4_step()|} repeatedly, with a step size \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|h|} and for a length of simulation time given in an input file.
 
 
 \subsection{Other integration methods}
@@ -85,6 +211,6 @@ The \textit{n}-body problem is the problem of determining the motion of $n$ poin
 
 
 \bibliographystyle{IEEEtran}
-\bibliography{bibfile}
+\bibliography{bibfile.bib}
 
 \end{document}
