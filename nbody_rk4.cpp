@@ -66,8 +66,8 @@ vector<double> acc(vector<double>& masses, vector<vector<double> >& positions,
 {
   int N = masses.size();
   vector<double> current_acc(3);
-  vector<double> r(3);
-  double rsq,r3,rmag;
+  vector<double> r(3), rnorm(3);
+  double rsq,rmag;
 
   for (int i=0; i<N; i++){
     if (i != index){
@@ -78,11 +78,10 @@ vector<double> acc(vector<double>& masses, vector<vector<double> >& positions,
       }
 
       rmag = sqrt(rsq + 0.0001);
-
-      r3 = pow(rmag,3.0);
+      rnorm = scalarmult(r,1.0/rmag);
 
       for (int j=0; j<3; j++){
-        current_acc[j] += masses[i]*r[j]/r3;
+        current_acc[j] += masses[i]*rnorm[j]/(rmag*rmag);
       }
     }
   }
