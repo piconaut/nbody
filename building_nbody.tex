@@ -64,7 +64,6 @@
 \subsection{Choosing an integratotion method}
 
 The \textit{n}-body problem is the problem of determining the motion of $n$ point masses $m_i$ at positions $\textbf{r}_i$, with $i=1,2,...,n$. With the motion of each point mass governed by Newton's law of universal gravitaion, the \textit{n}-body problem is represented by a system of $n$ second-order ordinary differential equations:
-
 \begin{equation}
     \textbf{r''}_i = \sum_{\substack{j=1\\j\neq i}}^n \frac{Gm_j}{\norm{\textbf{r}_i-\textbf{r}_j}^3}(\textbf{r}_j-\textbf{r}_i)
 \end{equation}
@@ -74,10 +73,8 @@ The \textit{n}-body problem is the problem of determining the motion of $n$ poin
 
 \subsection{Programming the Runge-Kutta method}
 % Particle vs. point mass vs star terminology
-% Cite Handbook of Mathematical Functions, by M. Abramowitz and I. A. Stegun, eds. [Dover, 1965]
 
 The fourth-order Runge-Kutta method (RK4) is a popular integrator for instructive purposes, although higher-order methods are generally used for research. To solve a second-order ODE of the form $\textbf{r''} = \textbf{F}(\textbf{r})$, like Newton's law of universal gravitation, the method is as follows \cite{olver1965handbook}:
-
 \begin{align}
   \textbf{r}_{n+1} &= \textbf{r}_n + h\bigg(\textbf{r'}_n + \frac{1}{6}(\textbf{k}_1 + 2\textbf{k}_2)\bigg) + \mathcal{O}(h^4) \\
   \textbf{r'}_{n+1} &= \textbf{r'}_n + \frac{1}{6}\textbf{k}_1 + \frac{2}{3}\textbf{k}_2 + \frac{1}{6}\textbf{k}_3 \\
@@ -185,13 +182,11 @@ vector<double> acc(vector<double> &masses, vector<vector<double> > &positions,
 \linespread{2}
 
 Now, it is worth mentioning that I actually had to make a choice in writing this code. There are two mathematically equivalent ways of representing Newton's law of universal gravitation. I gave one of them in Equation (1):
-
 \begin{equation*}
     \textbf{r''}_i = \sum_{\substack{j=1\\j\neq i}}^n \frac{Gm_j}{\norm{\textbf{r}_i-\textbf{r}_j}^3}(\textbf{r}_j-\textbf{r}_i)
 \end{equation*}
 
 Equivalently,
-
 \begin{equation}
     \textbf{r''}_i = \sum_{\substack{j=1\\j\neq i}}^n \frac{Gm_j}{\norm{\textbf{r}_i-\textbf{r}_j}^2}\frac{(\textbf{r}_j-\textbf{r}_i)}{\norm{\textbf{r}_i-\textbf{r}_j}}
 \end{equation}
@@ -200,10 +195,34 @@ While these mathematically mean the same thing, they might produce different res
 
 These two functions contain most of my \textit{n}-body code. The main function just runs \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|rk4_step()|} repeatedly, with a step size \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|h|} and for a length of simulation time given in an input file.
 
+% Danger running on phys-ugrad
+
+\subsection{Testing the code}
 
 \subsection{Other integration methods}
 
+% parallelized codes? check aarseth paper, makino maybe
+\textit{N}-body codes used for research tend to employ higher-order integrators than the fourth-order Runge-Kutta method. NBODY6 uses Hermite integration, which runs well in parallelized codes \cite{aarseth1999nbody1}. Hermite integration was introduced by Junichiro Makino for use on the special-purpose HARP computer \cite{makino1991optimal}. It is a predictor-corrector scheme for solving a differential equation of the form $\frac{dx}{dt}=f(x,t)$. In NBODY6, at each time step, force and its time-derivative are explicitly calculated, and expanded in a Taylor series to the third order. Given the force and its time-derivative at the current and previous time steps, the second and third time-derivatives are calculated from those expansions. Then, the Hermite interpolation polynomial $f_h(t)$ is calculated. Using force and its first, second, and third time-derivatives at $r$ points $t_{i-r+1},...,t_i$ to calculate $f(t_{i+1})$, it satisfies:
+\begin{equation}
+f^{(k)}_h(t_l) = f^{(k)}(x_l,t_l) \quad,\quad (k=0,1,2,3\,;\,l=i-r+1,...,i)
+\end{equation}
 
+This Hermite interpolation polynomial is used to calculate the predictor and corrector. The predictor $x_{p,i+1}$ is given by:
+\begin{equation}
+x_{p,i+1} = x_i + \int_{t_i}^{t_{i+1}} f_h(t)dt
+\end{equation}
+
+To produce a corrector, Equation (8) is applied again, with a slight change:
+\begin{equation}
+f^{(k)}_h(t_l) = f^{(k)}(x_l,t_l) \quad,\quad (k=0,1,2,3\,;\,l=i-r+2,...,i+1)
+\end{equation}
+
+with $x_{i+1} = x_p$. The Hermite interpolation polynomial interpolates the last $r$ steps, including the current one, using the predictor as $x_{i+1}$. Then, the corrector $x_{c,i+1}$ is calculated the same way the predictor was:
+\begin{equation}
+x_{c,i+1} = x_i + \int_{t_i}^{t_{i+1}} f_h(t)dt
+\end{equation}
+
+% Truncation error
 \section{Astrophysical considerations}
 
 \section{Studying star clusters using \textit{n}-body codes}
