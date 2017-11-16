@@ -77,7 +77,7 @@ vector<double> acc(vector<double>& masses, vector<vector<double> >& positions,
         rsq += r[j]*r[j];
       }
 
-      rmag = sqrt(rsq + 0.0001);
+      rmag = sqrt(rsq + 0.001);
       rnorm = scalarmult(r,1.0/rmag);
 
       for (int j=0; j<3; j++){
