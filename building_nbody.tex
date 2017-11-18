@@ -9,6 +9,8 @@
 \usepackage{caption}
 \usepackage{float}
 \usepackage{mathtools}
+\graphicspath{ {images/} }
+\captionsetup{justification=centering,margin=0cm,labelfont=bf}
 
 \DeclarePairedDelimiterX{\infdivx}[2]{(}{)}{%
   #1\;\delimsize\|\;#2%
@@ -59,9 +61,11 @@
 
 \section{Introduction}
 
+\textit{N}-body simulations are incredibly useful tools that allow astrophysicists to study diverse types of systems on many different scales. One such type of system is star clusters, which are composed of thousands or millions of stars, bound gravitationally. This report documents the process of building, from classical physics and a little bit of math, a very basic "toy" \textit{n}-body code, and using it to describe some very basic properties of the dynamics of globular clusters.
+
 \section{Building an \textit{n}-body code}
 
-\subsection{Choosing an integratotion method}
+\subsection{Choosing an integration method}
 
 The \textit{n}-body problem is the problem of determining the motion of $n$ point masses $m_i$ at positions $\textbf{r}_i$, with $i=1,2,...,n$. With the motion of each point mass governed by Newton's law of universal gravitaion, the \textit{n}-body problem is represented by a system of $n$ second-order ordinary differential equations:
 \begin{equation}
@@ -74,16 +78,16 @@ The \textit{n}-body problem is the problem of determining the motion of $n$ poin
 \subsection{Programming the Runge-Kutta method}
 % Particle vs. point mass vs star terminology
 
-The fourth-order Runge-Kutta method (RK4) is a popular integrator for instructive purposes, although higher-order methods are generally used for research. To solve a second-order ODE of the form $\textbf{r''} = \textbf{F}(\textbf{r})$, like Newton's law of universal gravitation, the method is as follows \cite{olver1965handbook}:
+The fourth-order Runge-Kutta method (RK4) is a popular integrator for instructive purposes, although higher-order methods are generally used for research. To solve a second-order ODE of the form $\textbf{r''} = \textbf{f}(\textbf{r})$, like Newton's law of universal gravitation, the method is as follows \cite{olver1965handbook}:
 \begin{align}
   \textbf{r}_{n+1} &= \textbf{r}_n + h\bigg(\textbf{r'}_n + \frac{1}{6}(\textbf{k}_1 + 2\textbf{k}_2)\bigg) + \mathcal{O}(h^4) \\
   \textbf{r'}_{n+1} &= \textbf{r'}_n + \frac{1}{6}\textbf{k}_1 + \frac{2}{3}\textbf{k}_2 + \frac{1}{6}\textbf{k}_3 \\
-  \textbf{k}_1 &= h\textbf{F}(\textbf{r}_n) \\
-  \textbf{k}_2 &= h\textbf{F}\bigg(\textbf{r}_n + \frac{h}{2}\textbf{r'}_n + \frac{h}{8}\textbf{k}_1\bigg) \\
-  \textbf{k}_3 &= h\textbf{F}\bigg(\textbf{r}_n + h\textbf{r'}_n + \frac{h}{2}\textbf{k}_2\bigg)
+  \textbf{k}_1 &= h\textbf{f}(\textbf{r}_n) \\
+  \textbf{k}_2 &= h\textbf{f}\bigg(\textbf{r}_n + \frac{h}{2}\textbf{r'}_n + \frac{h}{8}\textbf{k}_1\bigg) \\
+  \textbf{k}_3 &= h\textbf{f}\bigg(\textbf{r}_n + h\textbf{r'}_n + \frac{h}{2}\textbf{k}_2\bigg)
 \end{align}
 
-In the case of an \textit{n}-body code, \textbf{r} is a particle's position in space, and \textbf{F} is the force of gravity, from all the other particles.
+In the case of an \textit{n}-body code, \textbf{r} is a particle's position in space, and \textbf{f} is the force of gravity, divided by the particle's mass, from all the other particles.
 
 To get started programming RK4 in C++, I include the libraries \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|iostream|}, \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|iomanip|}, \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|fstream|}, \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|cmath|}, and \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|vector|}, and use the namespace \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|std|}. To generate particles with masses, positions, and velocities, I wrote a function called \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|read_file()|} which takes as arguments pointers to three vectors: \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|masses|}, which will contain the masses of the particles, \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|positions|}, which will contain their positions, and \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|velocities|}, which will contain their velocities. The latter two are vectors of vectors (or, 2D matrices), as each position and velocity is itself a vector of length 3, as we are working in three dimensions. Each of these vectors has a size of \textit{n}, where \textit{n} is the number of particles to be simulated. The function reads a file called \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|./fort.10|}, which contains this information in the format required for NBODY6, and fills the vectors with the values found therein. I have also written a function \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|vectoradd()|}, which takes two vectors as arguments and returns their sum as you would expect, and \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|scalarmult()|}, which takes a vector as its first argument and a scalar as its second argument and returns the vector multiplied by the scalar. 
 
@@ -191,13 +195,9 @@ Equivalently,
     \textbf{r''}_i = \sum_{\substack{j=1\\j\neq i}}^n \frac{Gm_j}{\norm{\textbf{r}_i-\textbf{r}_j}^2}\frac{(\textbf{r}_j-\textbf{r}_i)}{\norm{\textbf{r}_i-\textbf{r}_j}}
 \end{equation}
 
-While these mathematically mean the same thing, they might produce different results in a simulation. That's because, in Equation (1), we run the risk of getting a very small number for $\norm{\textbf{r}_i-\textbf{r}_j}^3$ in the denominator, and running into floating point errors. Although Alice and Bob, the characters in Hut and Makino's Maya Open Lab Development Series \cite{hut2007art}, seem happy to use Equation (1), I would suggest that they opt for Equation (7) instead, as I did.
+While these mathematically mean the same thing, they might produce different results in a simulation. That's because, in Equation (1), we run the risk of getting a very small number for $\norm{\textbf{r}_i-\textbf{r}_j}^3$ in the denominator, and running into floating point errors. Alice and Bob, the characters in Hut and Makino's Maya Open Lab Development Series \cite{hut2007art}, seem happy to use Equation (1), but they seem to know what they're doing better than I do, so I would defer to their judgement if they disagreed.
 
 These two functions contain most of my \textit{n}-body code. The main function just runs \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|rk4_step()|} repeatedly, with a step size \colorbox{g}{\lstinline[basicstyle=\ttfamily\footnotesize\color{black}]|h|} and for a length of simulation time given in an input file.
-
-% Danger running on phys-ugrad
-
-\subsection{Testing the code}
 
 \subsection{Other integration methods}
 
@@ -222,25 +222,78 @@ with $x_{i+1} = x_p$. The Hermite interpolation polynomial interpolates the last
 x_{c,i+1} = x_i + \int_{t_i}^{t_{i+1}} f_h(t)dt
 \end{equation}
 
-% Truncation error? Benefits?
-\section{Astrophysical considerations}
-
 \section{Studying star clusters using \textit{n}-body codes}
 
-Now that we have a working (or working to "toy \textit{n}-body" standards) code,  there are many features of a star cluster's dynamic life that we can study. Many of the features of a globular cluster's life should be visible in simulations carried out using my code. However, since my code uses only a fourth-order method, it has to use a smaller step size than higher-order methods, and since it just runs on a single CPU thread (rather than a GPU, or even just using multithreading), it is quite slow. So, although I have been (and am still) running a 10,000 star simulation, for the purpose of this report I have been limited to simulations of 1,000 stars or fewer. Unfortunately, my simulations of $n \sim 1000$ stars fail to exhibit many of the behaviours one would expect of simulations of more realistically-sized clusters with orders of magnitude more stars.
+Now that we have a working (or working to "toy \textit{n}-body" standards) code,  there are many features of a star cluster's dynamic life that we can study. Many of the features of a globular cluster's life should be visible in simulations carried out using my code. However, since my code uses only a fourth-order method, it has to use a smaller step size than higher-order methods, and since it just runs on a single CPU thread (rather than a GPU, or even just using multithreading), it is quite slow. So for the purpose of this report I have been limited to simulations of 1,000 stars or fewer; I will be trying to identify properties of star cluster dynamics in the results of such simulations.
 
-\subsection{Core collapse}
+\subsection{Equipartition and mass segregation}
 
-\subsection{Mass segregation}
+Many of the large-scale dynamical properties of star clusters are statistical results of individual, small-scale interactions. For example, stars in two-body encounters are statistically likely to equalize their kinetic energies; as a result, we observe equipartition of kinetic energies in star clusters:
+\begin{equation}
+\label{equipartition}
+m_1\langle v_1^2\rangle = m_2\langle v_2^2\rangle
+\end{equation}
 
-\subsection{Escape}
+for any ranges $m_1$ and $m_2$ of mass. 
 
-\subsection{Dissolution}
+The time it takes for stars in a cluster to (more or less) satisfy Equation \ref{equipartition} is called the relaxation time, $t_n=\frac{N}{8\ln N} \times t_{cross}$, with $t_{cross}$, the crossing time, being the time it takes a star to cross the cluster.
 
+In simulations, it is possible to verify equipartition of energy by plotting $v^2$ against mass and seeing that they are independent. However, it is arguably more fun to see how equipartition changes the physical structure of a star cluster, and measure that instead.
 
+Equipartition of energy leads high-mass stars to be concentrated near the centre of clusters, and low-mass stars to be spread around its edges; this is called mass segregation. When stars of different masses have roughly equal kinetic energies, higher-mass stars will be travelling slower on average than lower-mass stars. As a result, higher-mass stars sink in the system's potential well, to the centre of the cluster, while lower-mass stars expand outward. So, if we can measure the distribution in mass and space of stars in a cluster, at some point in the simulation, and observe that higher-mass stars tend to be near the centre, then at that point the cluster has reached equipartition. Additionally, the time it takes for the mass distribution in a cluster to reach a fairly constant state is the relaxation time.
 
+To explore equipartition and mass segregation, I had my \textit{n}-body code run a couple different simulations. The first is 1000 stars, using for initial conditions a King model with $w_0=7$, with a mass function from Kroupa 2001 \cite{kroupa2001variation} from 0.1 to 50Msun, virialized, generated using McLuster \cite{kupper2011mass}. I used a step size of $h=0.001$. From hereon in, this will be referred to as \textbf{Sim A}. As shown in \textbf{Figure \ref{nbody_log_1k_dist}}, although at the start of the simulation the Lagrangian shells all contain stars with very similar average masses, early on in the simulation the 10\% and 25\% Lagrangian shells increase in average mass, as high-mass stars migrate inwards and low-mass stars migrate outwards.
+
+\begin{figure}
+\centering
+    \includegraphics[width=0.85\textwidth]{nbody_log_1k_dist}
+    \linespread{1}
+    \caption{Average mass of stars contained in different Lagrangian shells through simulation, \textbf{Sim A}.}
+    \label{nbody_log_1k_dist}
+\end{figure}
+\linespread{1}
+
+I ran a second simulation (\textbf{Sim B}) with 1000 stars, using for initial conditions no density gradient, with a mass function from Kroupa 2001 \cite{kroupa2001variation} from 0.1 to 50Msun, and "cold" -- that is, with all stars having no velocity, also generated using McLuster. I used a step size of $h=0.001$. As shown in \textbf{Figure \ref{nbody_log_cold_dist}}, the average masses in the 10\% and 25\% Lagrangian shells are very noisy for the first half of the simulation; this is because during this time, the cluster is rapidly collapsing and all the stars are passing through the centre at around the same time. However, throughout the simulation we find that the average mass in the 50\% Lagrangian shell is clearly higher than the average mass in the 75\% shell, and after halfway through the simulation, the simulation, the average mass in the 25\% shell is higher than that of the 50\% shell too. The 10\% shell is still too confused to mean much, however.
+
+\begin{figure}
+\centering
+    \includegraphics[width=0.85\textwidth]{nbody_log_cold_dist}
+    \linespread{1}
+    \caption{Average mass of stars contained in different Lagrangian shells through simulation, \textbf{Sim B}.}
+    \label{nbody_log_cold_dist}
+\end{figure}
+\linespread{1}
+
+\subsection{Escape and evaporation}
+
+If at any point a star has a kinetic energy exceeding the gravitational potential of its stellar system at its location, it will almost certainly escape the system \cite{heggie2003gravitational}. This condition is shown in Equation \ref{escape}.
+\begin{equation}
+\label{escape}
+\frac{v_{esc}^2}{2} + \phi > 0
+\end{equation}
+
+where $v_{esc}$ is the escape velocity $\phi$ is the smoothed potential of the system at the star's location.
+
+Stars can gain become escapers by gaining velocity through interactions with other stars, or by, rather than gaining kinetic energy, having a constant energy while stars in the system evolve and lose mass, decreasing the depth of the its potential well \cite{heggie2003gravitational}. 
+
+As previously discussed, in two-body encounters between stars, their energies tend to equalize. Therefore, in encounters between higher- and lower-mass stars, there is a tendency for lower-mass stars to come out with higher velocities than the higher-mass stars with which they interact. It is low-mass stars, then, that tend to reach escape velocity and escape the cluster. Over the lifetime of a cluster, more and more stars will escape in this way, and eventually evaporate. The cluster in \textbf{Sim A} is dissolving from the very beginning. As shown in \textbf{Figure \ref{nbody_log_1k_50}}, the Lagrangian radii are expanding, with the outer radii expanding faster than the inner radii. This is because the low-mass stars are expanding outwards, and the 75\% Lagrangian radius with them, and many are being ejected from the cluster. Meanwhile, the 1\%, 5\%, and 10\% Lagrangian radii, whose masses are mostly composed of large stars with low velocities, do not expand much, if at all.
+\begin{figure}
+\centering
+    \includegraphics[width=0.85\textwidth]{nbody_log_1k_50.png}
+    \linespread{1}
+    \caption{Lagrangian radii of \textbf{Sim A}.}
+    \label{nbody_log_1k_50}
+\end{figure}
+\linespread{1}
+
+In "real" \textit{n}-body simulations, often a cluster is limited by the tidal that it lives in; depending on the tidal field, the cluster will have some tidal radius, beyond which the external gravitational field of the galaxy dominates the dynamics of any stars. Stars that pass the tidal radius are considered lost to the cluster, and so the cluster sheds mass over time and evaporates.
+
+\section{Conclusion}
+
+The process of constructing and using an \textit{n}-body code has been full of choices. For example, I chose to use a fourth-order Runge-Kutta integrator, even though there are plenty of better ones, like the Hermite integrator. I chose not to include a tidal field, and not to implement stellar evolution. I chose not to deal with mergers, or use variable time steps, or step stars forward through time individually. I chose to analyze a paltry few aspects of my simulations' results. The "toy" \textit{n}-body code is orders of magnitude simpler than any the professional codes used for research, and even so, there is an immense amount of things I could learn from it, by running different analyses on the data it has produced, or by tweaking the initial conditions, or by simply letting it run for longer and watching how my clusters dissolve. The simplicity of my code highlights the careful thought and rigour and comprehensiveness of other codes, and reveals the staggering volume of \textit{things} to be understood about star clusters, and stellar dynamics in general. I can learn (and already have learned) a lot about stellar dynamics from my own code, and it's very basic and slow, so it's exciting to imagine what can be learned from studying realistic systems using professional codes. The work described in this report will serve as a foundation for the development of such tools in the coming months, which will hopefully help illuminate an interesting little corner of the vast terrain of stellar dynamics.
 
 \bibliographystyle{IEEEtran}
 \bibliography{bibfile.bib}
+
 
 \end{document}
