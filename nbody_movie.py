@@ -7,23 +7,24 @@ import pygame
 import pygame.camera
 from pygame.locals import *
 
-os.environ['SDL_VIDEODRIVER'] = 'dummy'
+#os.environ['SDL_VIDEODRIVER'] = 'dummy'
 
 sim_w = 10.0
 sim_h = 10.0
 sim_depth = 2.0
-screen_w = 400
-screen_h = 400
+screen_w = 800
+screen_h = 800
 
 w_factor = screen_w/sim_w
 h_factor = screen_h/sim_h
 
 pygame.init()
 pygame.display.set_mode((1,1))
-screen = pygame.Surface((400, 400), pygame.SRCALPHA, 32)
-pygame.draw.rect(screen, (0,0,0), (0, 0, 400, 400), 0)
+screen = pygame.display.set_mode((screen_w,screen_h))
+#screen = pygame.Surface((400, 400)), pygame.SRCALPHA, 32)
+pygame.draw.rect(screen, (0,0,0), (0, 0, 800, 800), 0)
 
-def draw(pos):
+def draw(pos,mass):
 
   # Fill screen with black
   screen.fill((0,0,0))
@@ -31,7 +32,12 @@ def draw(pos):
   # Draw bodies
   for i in range(len(pos)):
 #    pygame.draw.circle(screen,(max(min(255,pos[i][2]*255.),0),max(min(255,pos[i][2]*255),0),max(min(255,pos[i][2]*255.),0)), (math.floor(pos[i][0]*w_factor), math.floor(pos[i][1]*h_factor)),1)
-    screen.set_at((math.floor(pos[i][0]*w_factor), math.floor(pos[i][1]*h_factor)),(max(min(255,pos[i][2]*255.),0),max(min(255,pos[i][2]*255),0),max(min(255,pos[i][2]*255.),0)))
+    if mass[i] > 0.005:
+      screen.set_at((math.floor(pos[i][0]*w_factor), math.floor(pos[i][1]*h_factor)),(255,0,0))
+    elif mass[i] < 0.000175:
+      screen.set_at((math.floor(pos[i][0]*w_factor), math.floor(pos[i][1]*h_factor)),(0,255,0))
+    else:
+      screen.set_at((math.floor(pos[i][0]*w_factor), math.floor(pos[i][1]*h_factor)),(max(min(255,pos[i][2]*255.),0),max(min(255,pos[i][2]*255),0),max(min(255,pos[i][2]*255.),0)))
 
   # Flip display
   pygame.display.flip()
@@ -49,7 +55,7 @@ with open('nbody.log','r') as f:
       line_split = line.strip().split(' ')
     
       if len(line_split) == 1:
-        draw(pos)
+        draw(pos,mass)
         for i in range(len(mass)):
           Ek += 0.5*mass[i]*np.linalg.norm(np.array([vel[i][0],vel[i][1],vel[i][2]]))**2
           for j in range(len(mass)):
@@ -72,5 +78,5 @@ with open('nbody.log','r') as f:
         vel.append([float(line_split[4]), float(line_split[5]), float(line_split[6])])
         mass.append(float(line_split[0]))
 
-os.system("avconv -r 100 -f image2 -i video/%04d.png -y -qscale 0 -s " + str(screen_w) + "x"     + str(screen_h) + " -aspect 1:1 result.mp4")
+os.system("avconv -r 30 -f image2 -i video/%04d.png -y -qscale 0 -s " + str(screen_w) + "x"     + str(screen_h) + " -aspect 1:1 result.mp4")
 #os.system("rm video/*")

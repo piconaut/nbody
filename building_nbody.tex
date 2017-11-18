@@ -222,10 +222,21 @@ with $x_{i+1} = x_p$. The Hermite interpolation polynomial interpolates the last
 x_{c,i+1} = x_i + \int_{t_i}^{t_{i+1}} f_h(t)dt
 \end{equation}
 
-% Truncation error
+% Truncation error? Benefits?
 \section{Astrophysical considerations}
 
 \section{Studying star clusters using \textit{n}-body codes}
+
+Now that we have a working (or working to "toy \textit{n}-body" standards) code,  there are many features of a star cluster's dynamic life that we can study. Many of the features of a globular cluster's life should be visible in simulations carried out using my code. However, since my code uses only a fourth-order method, it has to use a smaller step size than higher-order methods, and since it just runs on a single CPU thread (rather than a GPU, or even just using multithreading), it is quite slow. So, although I have been (and am still) running a 10,000 star simulation, for the purpose of this report I have been limited to simulations of 1,000 stars or fewer. Unfortunately, my simulations of $n \sim 1000$ stars fail to exhibit many of the behaviours one would expect of simulations of more realistically-sized clusters with orders of magnitude more stars.
+
+\subsection{Core collapse}
+
+\subsection{Mass segregation}
+
+\subsection{Escape}
+
+\subsection{Dissolution}
+
 
 
 
