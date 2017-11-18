@@ -199,6 +199,7 @@ int main()
   for (int step=0; step<timesteps; step++){
     // Step forward RK4
     rk4_step(masses,positions,velocities,h,new_positions, new_velocities, false);
+    // Every 100 steps print out state of system
     if(step%100==0){
       for (int star=0; star<N; star++){
         cout << masses[star] << " " << positions[star][0] << " " 
@@ -211,11 +212,3 @@ int main()
   }
   return 0;
 }
-
-
-
-
-
-
-
-
