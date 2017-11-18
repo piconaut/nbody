@@ -161,12 +161,14 @@ int main()
   double h;
   double time;
 
+  // Get input file
   ifstream inFile;
   inFile.open("input");
   if (!inFile){
     cout << "Unable to open input" << endl;
   }
 
+  // Get timestep and time to run from input file
   double number;
   int counter = 0;
   while (inFile >> number){
@@ -181,6 +183,7 @@ int main()
 
   unsigned long int timesteps = (time/h);
 
+  // Positions and velocities from NBODYx fort.10
   vector<double> masses;
   vector<vector<double> > positions, velocities;
 
@@ -192,35 +195,20 @@ int main()
 
   double Et,velocity_sq;
 
+  // For each timestep
   for (int step=0; step<timesteps; step++){
+    // Step forward RK4
     rk4_step(masses,positions,velocities,h,new_positions, new_velocities, false);
-    Et = 0;
-    for (int star=0; star<N; star++){
-
- //     velocity_sq = pow(velocities[star][0],2) + pow(velocities[star][1],2) + pow(velocities[star][2],2);
- //     Et += 0.5 * masses[star] * velocity_sq;
-
-      if(step%100==0){
+    if(step%100==0){
+      for (int star=0; star<N; star++){
         cout << masses[star] << " " << positions[star][0] << " " 
              << positions[star][1] << " " << positions[star][2] << " "
              << velocities[star][0] << " " << velocities[star][1] << " "
              << velocities[star][2] << endl;
-//        velocity_sq = pow(velocities[star][0],2) + pow(velocities[star][1],2) + pow(velocities[star][2],2);
- //       Et += 0.5 * masses[star] * velocity_sq;
-  //      if(star == 0){
-          
-  //        Et -= 1/sqrt(pow(positions[1][0]-positions[0][0],2)+pow(positions[1][1]-positions[0][1],2) + pow(positions[1][2]-positions[0][2],2));
-   //     }
       }
     }
-//    cout << Et << endl;
     if(step%100==0){cout << "!!!!!!!!!" <<step<< endl;}
-
- //   if(step%100==0){cout<<Et<<endl;}
   }
-//  cout<<Et<<endl;
-
-//  cout << positions[0][0] << " " << positions[0][1] << " " << positions[0][2] << endl;
   return 0;
 }
 
